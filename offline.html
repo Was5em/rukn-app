@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>لا يوجد اتصال بالإنترنت – ركن الصغار</title>
+    <style>
+        :root {
+            --bg: #FFF6E0;
+            --card: #ffffff;
+            --ink: #1F2A2E;
+            --teal: #0F6B6B;
+            --gold: #F2B233;
+            --coral: #E86A5A;
+            --ok: #2E9E5B;
+            --line: #E8DCB8;
+            box-sizing: border-box;
+            padding-top: env(safe-area-inset-top, 0px);
+            padding-bottom: env(safe-area-inset-bottom, 0px);
+        }
+        @media (prefers-color-scheme: dark) {
+            :root:not([data-theme="light"]) {
+                --bg: #10262A;
+                --card: #193A3F;
+                --ink: #FFF3D6;
+                --teal: #5CC7C0;
+                --line: #2B5A5F;
+            }
+        }
+        :root[data-theme="dark"] {
+            --bg: #10262A;
+            --card: #193A3F;
+            --ink: #FFF3D6;
+            --teal: #5CC7C0;
+            --line: #2B5A5F;
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            margin: 0;
+            padding: 16px;
+            background: var(--bg);
+            color: var(--ink);
+            font-family: "Baloo Bhaijaan 2", Tahoma, "Segoe UI", system-ui, sans-serif;
+            font-size: 20px;
+            line-height: 1.7;
+            display: flex;
+            min-height: 100vh;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+        .offline-card {
+            background: var(--card);
+            border: 3px solid var(--line);
+            border-radius: 24px;
+            padding: 36px 24px;
+            max-width: 460px;
+            width: 100%;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+        }
+        .offline-emoji {
+            font-size: 76px;
+            display: inline-block;
+            margin-bottom: 16px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        h1 {
+            font-size: 26px;
+            color: var(--teal);
+            margin: 0 0 12px 0;
+        }
+        p {
+            margin: 0 0 24px 0;
+            font-size: 19px;
+            opacity: 0.9;
+        }
+        .actions {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            align-items: center;
+        }
+        button, .btn {
+            font: inherit;
+            cursor: pointer;
+            border: 0;
+            border-radius: 18px;
+            padding: 12px 28px;
+            font-weight: 700;
+            font-size: 19px;
+            text-decoration: none;
+            display: inline-block;
+            transition: transform 0.1s, opacity 0.2s;
+            width: 100%;
+            max-width: 260px;
+        }
+        button:active, .btn:active {
+            transform: scale(0.96);
+        }
+        button:focus-visible, .btn:focus-visible {
+            outline: 4px solid var(--gold);
+            outline-offset: 2px;
+        }
+        .btn-retry {
+            background: var(--teal);
+            color: #ffffff;
+        }
+        .btn-home {
+            background: transparent;
+            color: var(--teal);
+            border: 2px solid var(--line);
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+    </style>
+    <script>
+        try {
+            const theme = localStorage.getItem("rukn_theme");
+            if (theme) document.documentElement.setAttribute("data-theme", theme);
+        } catch(e) {}
+
+        window.addEventListener('online', () => {
+            window.location.reload();
+        });
+    </script>
+</head>
+<body>
+    <div class="offline-card">
+        <span class="offline-emoji" role="img" aria-label="لا يوجد اتصال">📡</span>
+        <h1>لا يوجد اتصال بالإنترنت</h1>
+        <p>يرجى الاتصال بالإنترنت وإعادة المحاولة</p>
+        <div class="actions">
+            <button class="btn-retry" onclick="window.location.reload()">🔄 إعادة المحاولة</button>
+            <a href="index.html" class="btn btn-home">🏠 الصفحة الرئيسية</a>
+        </div>
+    </div>
+</body>
+</html>

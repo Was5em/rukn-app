@@ -1,0 +1,26 @@
+{
+  "name": "ركن الصغار – العب وتعلّم",
+  "short_name": "ركن الصغار",
+  "description": "تطبيق تعليمي وتفاعلي للأطفال المسلمين",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "dir": "rtl",
+  "lang": "ar",
+  "background_color": "#FFF6E0",
+  "theme_color": "#0F6B6B",
+  "icons": [
+    {
+      "src": "icon_192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon_512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
