@@ -231,15 +231,30 @@ const recordStat = (question, isCorrect) => {
 const app = document.getElementById("app");
 const pScreen = document.getElementById("profiles-screen");
 const mascot = document.getElementById("mascot");
+const stopAllAudio = () => {
+    try {
+        if(window._currentAudio) {
+            window._currentAudio.pause();
+            window._currentAudio.currentTime = 0;
+            window._currentAudio = null;
+        }
+        if('speechSynthesis' in window) {
+            speechSynthesis.cancel();
+        }
+        document.querySelectorAll('.listen-icon').forEach(ic => ic.textContent = '🔊');
+    } catch(e) {}
+};
+
 const say = (t, audioFile) => {
     try {
         const p = Profiles[currentProfileId];
         if(p && p.soundEnabled === false) return; 
-        if(window._currentAudio) { window._currentAudio.pause(); window._currentAudio.currentTime = 0; }
+        stopAllAudio();
         const a = new Audio(`audio/${audioFile}`);
+        window._currentAudio = a;
         a.play().catch(e => {
             console.log(`Missing human audio: audio/${audioFile}. Playing robot voice instead.`);
-            speechSynthesis.cancel();
+            stopAllAudio();
             const u = new SpeechSynthesisUtterance(t);
             u.lang = "ar-SA";
             u.rate = 0.8;
@@ -441,6 +456,7 @@ function generateSmartReview() {
     return { id: "smart_review", t: "المراجعة الذكية", e: "🧠", r: reviewQuestions };
 }
 window.home = () => {
+  stopAllAudio();
   const p = Profiles[currentProfileId];
   checkBadges(p);
   const dailySec = SECTIONS.find(s => s.id === 'daily');
@@ -601,21 +617,52 @@ window.play = (sec, i) => {
     box.innerHTML = html;
     box.querySelectorAll('.listen-item').forEach(item => {
         item.onclick = () => {
-            sfx.pop();
             const r = sec.r[parseInt(item.dataset.idx)];
-            if(window._currentAudio) { window._currentAudio.pause(); window._currentAudio.currentTime = 0; }
-            box.querySelectorAll('.listen-icon').forEach(ic => ic.textContent = '🔊');
+            const audioSrc = `audio/${r.a}`;
+            
+            if (window._currentAudio && window._currentAudio.datasetSrc === audioSrc) {
+                if (window._currentAudio.paused) {
+                    window._currentAudio.play();
+                    item.querySelector('.listen-icon').textContent = '⏸️';
+                } else {
+                    window._currentAudio.pause();
+                    item.querySelector('.listen-icon').textContent = '▶️';
+                }
+                return;
+            }
+
+            sfx.pop();
+            stopAllAudio();
+
             item.querySelector('.listen-icon').textContent = '⏳';
-            const a = new Audio(`audio/${r.a}`);
+            const a = new Audio(audioSrc);
+            a.datasetSrc = audioSrc;
             window._currentAudio = a;
-            a.oncanplaythrough = () => item.querySelector('.listen-icon').textContent = '⏸️';
-            a.onended = () => { item.querySelector('.listen-icon').textContent = '🔊'; window._currentAudio = null; };
-            a.onerror = () => { item.querySelector('.listen-icon').textContent = '🔊'; };
-            a.play().catch(e => { item.querySelector('.listen-icon').textContent = '🔊'; });
-            item.onclick = () => {
-                if(a.paused) { a.play(); item.querySelector('.listen-icon').textContent = '⏸️'; }
-                else { a.pause(); item.querySelector('.listen-icon').textContent = '▶️'; }
+
+            a.oncanplaythrough = () => {
+                if (window._currentAudio === a && !a.paused) {
+                    item.querySelector('.listen-icon').textContent = '⏸️';
+                }
             };
+            a.onplay = () => {
+                item.querySelector('.listen-icon').textContent = '⏸️';
+            };
+            a.onpause = () => {
+                if (window._currentAudio === a) {
+                    item.querySelector('.listen-icon').textContent = '▶️';
+                }
+            };
+            a.onended = () => {
+                item.querySelector('.listen-icon').textContent = '🔊';
+                if (window._currentAudio === a) window._currentAudio = null;
+            };
+            a.onerror = () => {
+                item.querySelector('.listen-icon').textContent = '🔊';
+                if (window._currentAudio === a) window._currentAudio = null;
+            };
+            a.play().catch(e => {
+                item.querySelector('.listen-icon').textContent = '🔊';
+            });
         };
     });
     app.appendChild(box);
@@ -939,10 +986,18 @@ window.shareScore = () => {
 };
 window.changeFontSize = (size) => {
     sfx.pop();
+    const scale = size / 20;
+    document.documentElement.style.setProperty('--font-scale', scale);
     document.body.style.fontSize = size + 'px';
     localStorage.setItem('rukn_font_size', size);
 };
-(function(){ const fs = localStorage.getItem('rukn_font_size'); if(fs) document.body.style.fontSize = fs + 'px'; })();
+(function(){ 
+    const fs = localStorage.getItem('rukn_font_size'); 
+    if(fs) {
+        document.body.style.fontSize = fs + 'px';
+        document.documentElement.style.setProperty('--font-scale', fs / 20);
+    }
+})();
 window.requestReminder = () => {
     if(!('Notification' in window)) { alert('متصفحك لا يدعم الإشعارات'); return; }
     Notification.requestPermission().then(perm => {
