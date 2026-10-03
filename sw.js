@@ -12,7 +12,7 @@ const ASSETS = [
     './privacy.html',
     './audio/adhan.mp3',
     './audio/dua_0.mp3',
-    './audio/dua_1.mp4',
+    './audio/dua_1.mp3',
     './audio/dua_2.mp3',
     './audio/dua_4.mp3',
     './audio/dua_5.mp3',

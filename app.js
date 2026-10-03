@@ -199,8 +199,9 @@ setInterval(() => {
     if(!currentProfileId || document.getElementById('app').style.display !== 'block') return;
     const p = Profiles[currentProfileId];
     if(p.screenTimeLimit === 0) return; 
-    p.screenTimeUsed = (p.screenTimeUsed || 0) + (1/60); 
-    if(Math.floor((p.screenTimeUsed*60)) % 30 === 0) save(); 
+    p.screenTimeSec = (p.screenTimeSec || Math.round((p.screenTimeUsed || 0) * 60)) + 1;
+    p.screenTimeUsed = p.screenTimeSec / 60;
+    if(p.screenTimeSec % 30 === 0) save(); 
     if(p.screenTimeUsed >= p.screenTimeLimit) {
         showLockScreen();
     }
@@ -686,7 +687,7 @@ window.play = (sec, i) => {
     box.querySelector("#lst").onclick = () => { sfx.pop(); say(r.x, `${sec.id}_${i}.mp3`); };
   } else if (r.k === "choice") {
     const isFav = JSON.parse(localStorage.getItem('rukn_favorites') || '[]').includes(r.p);
-    box.innerHTML = `<button class="parents-btn" style="position:absolute;top:12px;left:12px;" onclick="toggleFavorite('${r.p.replace(/'/g,"\\'")}')" title="إضافة للمفضلة">${isFav?'⭐ بالمفضلة':'☆ إضافه للمفضلة'}</button>
+    box.innerHTML = `<button class="parents-btn" style="position:absolute;top:12px;left:12px;" onclick="toggleFavorite(decodeURIComponent('${encodeURIComponent(r.p)}'))" title="إضافة للمفضلة">${isFav?'⭐ بالمفضلة':'☆ إضافه للمفضلة'}</button>
         <div class="big">${r.e || "❓"}</div><p style="font-size:22px;font-weight:bold;">${r.p}</p>
         ${r.ref ? `<small style="display:block;opacity:0.6;margin-bottom:8px;">(${r.ref})</small>` : ''}
         <div id="os"></div><div class="msg" id="m"></div>`;
@@ -722,7 +723,7 @@ window.play = (sec, i) => {
   } else {
     const words = r.a.split(r.sep || " ");
     const isFav = JSON.parse(localStorage.getItem('rukn_favorites') || '[]').includes(r.p);
-    box.innerHTML = `<button class="parents-btn" style="position:absolute;top:12px;left:12px;" onclick="toggleFavorite('${r.p.replace(/'/g,"\\'")}')" title="إضافة للمفضلة">${isFav?'⭐ بالمفضلة':'☆ إضافه للمفضلة'}</button>
+    box.innerHTML = `<button class="parents-btn" style="position:absolute;top:12px;left:12px;" onclick="toggleFavorite(decodeURIComponent('${encodeURIComponent(r.p)}'))" title="إضافة للمفضلة">${isFav?'⭐ بالمفضلة':'☆ إضافه للمفضلة'}</button>
         <div class="big">${r.e}</div><p style="font-size:22px;font-weight:bold;">${r.p}</p>
         ${r.ref ? `<small style="display:block;opacity:0.6;margin-bottom:8px;">(${r.ref})</small>` : ''}
         <div class="row ans" id="an"></div><div class="row" id="pl"></div><div class="msg" id="m"></div><button class="go" id="lst">🔊 اسمع</button>`;
@@ -917,7 +918,7 @@ window.showFavorites = () => {
         favs.forEach(f => {
             html += `<div class="profile-card" style="margin:8px 0;background:var(--bg);">
                 <span style="flex-grow:1;text-align:right;font-size:18px;">${f}</span>
-                <button class="parents-btn" onclick="toggleFavorite('${f.replace(/'/g,"\\'")}'); showFavorites();">❌</button>
+                <button class="parents-btn" onclick="toggleFavorite(decodeURIComponent('${encodeURIComponent(f)}')); showFavorites();">❌</button>
             </div>`;
         });
         box.innerHTML = html;
